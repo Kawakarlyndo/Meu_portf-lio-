@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    canvas {
+      border: 10px solid dimgray;
+      background: darkgray;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="snakeCanvas" width="330" height="555"></canvas>
+  <script>
+    const canvas = document.getElementById("snakeCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const boxSize = 10;
+    let snake = [{ x: 10, y: 10 }];
+    let food = { x: 15, y: 15 };
+    let direction = "right";
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "red";
+      snake.forEach(segment => {
+        ctx.fillRect(segment.x * boxSize, segment.y * boxSize, boxSize, boxSize);
+      });
+
+const img = new Image();
+img.src = "./img/Instagram_logo_2016.svg.png";
+
+img.onload = function () {
+  ctx.drawImage(img, food.x * boxSize, food.y * boxSize, boxSize, boxSize);
+};
+    }
+
+    function update() {
+      const head = { ...snake[0] };
+      switch (direction) {
+        case "up":
+          head.y--;
+          break;
+        case "down":
+          head.y++;
+          break;
+        case "left":
+          head.x--;
+          break;
+        case "right":
+          head.x++;
+          break;
+      }
+
+      if (head.x === food.x && head.y === food.y) {
+        food = {
+          x: Math.floor(Math.random() * (canvas.width / boxSize)),
+          y: Math.floor(Math.random() * (canvas.height / boxSize)),
+        };
+      } else {
+        snake.pop();
+      }
+
+      snake.unshift(head);
+
+      if (head.x < 0 || head.y < 0 || head.x >= canvas.width / boxSize || head.y >= canvas.height / boxSize) {
+        alert("Game Over!");
+        resetGame();
+      }
+
+      for (let i = 1; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+          alert("Game Over!");
+          resetGame();
+        }
+      }
+    }
+
+    function resetGame() {
+      snake = [{ x: 10, y: 10 }];
+      direction = "right";
+    }
+
+    function gameLoop() {
+  draw();
+  update();
+  setTimeout(gameLoop, 100);
+}
+
+    window.addEventListener("keydown", (e) => {
+      switch (e.key) {
+        case "ArrowUp":
+          direction = "up";
+          break;
+        case "ArrowDown":
+          direction = "down";
+          break;
+        case "ArrowLeft":
+          direction = "left";
+          break;
+        case "ArrowRight":
+          direction = "right";
+          break;
+      }
+    });
+let startX;
+let startY;
+
+canvas.addEventListener("touchstart", (e) => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+});
+
+canvas.addEventListener("touchmove", (e) => {
+  const deltaX = e.touches[0].clientX - startX;
+  const deltaY = e.touches[0].clientY - startY;
+
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > 0) {
+      direction = "right";
+    } else {
+      direction = "left";
+    }
+  } else {
+    if (deltaY > 0) {
+      direction = "down";
+    } else {
+      direction = "up";
+    }
+  }
+});
+
+canvas.addEventListener("touchend", () => {
+  startX = null;
+  startY = null;
+});
+
+    gameLoop();
+  </script>
+</body>
+</html>
